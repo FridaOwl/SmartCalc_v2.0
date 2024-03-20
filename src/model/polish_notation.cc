@@ -1,24 +1,21 @@
 #include "polish_notation.h"
 
-#include "string_validation.h"
-
 namespace MyCalculator {
 
-const std::map<std::string, char> PolishNotation::functions = {
+const std::map<std::string, char> MyCalculator::PolishNotation::functions = {
     {"sin", 's'},  {"cos", 'c'},  {"tan", 't'}, {"asin", 'i'}, {"acos", 'o'},
     {"atan", 'n'}, {"sqrt", 'q'}, {"ln", 'l'},  {"log", 'g'}};
 
-std::string PolishNotation::toPostfix(const std::string &infix) {
+std::string MyCalculator::PolishNotation::toPostfix(const std::string &infix) {
   std::stack<char> operatorStack;
   std::string postfix = "";
-  std::map<char, int> priority = {{'+', 1}, {'-', 1}, {'*', 2}, {'/', 2},
+  std::map<char, int> Priority = {{'+', 1}, {'-', 1}, {'*', 2}, {'/', 2},
                                   {'%', 2}, {'u', 4}, {'^', 5}};
 
-  StringValidator checkString(infix);
+  MyCalculator::StringValidator checkString(infix);
   if (!checkString.IsValid()) {
-    throw std::invalid_argument("Invalid equation!");
+    throw std::invalid_argument("The equation is incorrect!");
   }
-
   for (size_t i = 0; i < infix.size(); i++) {
     char c = infix[i];
     if (std::isdigit(c) || c == '.') {
@@ -34,24 +31,26 @@ std::string PolishNotation::toPostfix(const std::string &infix) {
       if (!operatorStack.empty()) {
         operatorStack.pop();
       }
-    } else if (c == '-') {
-      if (i == 0 || infix[i - 1] == '(' || isOperation(infix[i - 1])) {
+    }
+
+    else if (c == '-') {
+      if (i == 0 || infix[i - 1] == '(' || operation(infix[i - 1])) {
         operatorStack.push('u');
       } else {
         while (!operatorStack.empty() && operatorStack.top() != '(' &&
-               operationPriority(operatorStack.top()) >= operationPriority(c)) {
+               priorityOperation(operatorStack.top()) >= priorityOperation(c)) {
           postfix += operatorStack.top();
           postfix += ' ';
           operatorStack.pop();
         }
         operatorStack.push(c);
       }
-    } else if (isOperation(c)) {
+    } else if (operation(c)) {
       while (!operatorStack.empty() && operatorStack.top() != '(' &&
-             (c != '^' ? operationPriority(operatorStack.top()) >=
-                             operationPriority(c)
-                       : operationPriority(operatorStack.top()) >
-                             operationPriority(c))) {
+             (c != '^' ? priorityOperation(operatorStack.top()) >=
+                             priorityOperation(c)
+                       : priorityOperation(operatorStack.top()) >
+                             priorityOperation(c))) {
         postfix += operatorStack.top();
         postfix += ' ';
         operatorStack.pop();
@@ -68,7 +67,6 @@ std::string PolishNotation::toPostfix(const std::string &infix) {
       }
     }
   }
-
   while (!operatorStack.empty()) {
     postfix += operatorStack.top();
     postfix += ' ';
@@ -78,8 +76,9 @@ std::string PolishNotation::toPostfix(const std::string &infix) {
   return postfix;
 }
 
-void PolishNotation::findNumeric(const std::string &infix, size_t &index,
-                                 std::string &postfix) {
+void MyCalculator::PolishNotation::findNumeric(const std::string &infix,
+                                               size_t &index,
+                                               std::string &postfix) {
   while (index < infix.size() &&
          (std::isdigit(infix[index]) || infix[index] == '.' ||
           infix[index] == 'e' || infix[index] == 'E')) {
@@ -91,7 +90,7 @@ void PolishNotation::findNumeric(const std::string &infix, size_t &index,
       if (index + 1 < infix.size() && std::isdigit(infix[index + 1])) {
         postfix += infix[++index];
       } else {
-        throw std::invalid_argument("Invalid scientific notation");
+        throw std::invalid_argument("Incorrect number");
       }
     }
     index++;
@@ -100,12 +99,12 @@ void PolishNotation::findNumeric(const std::string &infix, size_t &index,
   index--;
 }
 
-bool PolishNotation::isOperation(char c) {
+bool MyCalculator::PolishNotation::operation(char c) {
   return c == '+' || c == '-' || c == '*' || c == '/' || c == '^' || c == '%' ||
          c == 'u';
 }
 
-int PolishNotation::operationPriority(char c) {
+int MyCalculator::PolishNotation::priorityOperation(char c) {
   switch (c) {
     case '+':
     case '-':
