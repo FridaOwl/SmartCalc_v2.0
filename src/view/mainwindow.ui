@@ -894,7 +894,7 @@ QPushButton:hover {
 }</string>
     </property>
     <property name="text">
-     <string>build a graph</string>
+     <string>graph</string>
     </property>
     <property name="autoRepeat">
      <bool>false</bool>
