@@ -37,12 +37,12 @@ start:
 dist: install
 	@rm -rf dist
 	@mkdir dist
-	@cp -R $(PATH_APP) model view controller tests Makefile README.md dist
-	@cd dist && tar cvzf SmartCalc_v2.0.tgz * && rm -rf controller model tests view SmartCalc_v2 Makefile README.md
+	@cp -R $(PATH_APP) model view controller tests Makefile dvi.md dist
+	@cd dist && tar cvzf SmartCalc_v2.0.tgz * && rm -rf controller model tests view SmartCalc_v2 Makefile dvi.md
 	@rm -rf SmartCalc_v2.0
 
 dvi:
-	@$(OPEN_CMD) README.md
+	@$(OPEN_CMD) dvi.md
 
 test:
 	@$(CC) $(CPPFLAGS) $(OBJ_TEST) $(OBJ_MODEL) $(OBJ_CONTROLLER) -o test $(ADD_LIB)
