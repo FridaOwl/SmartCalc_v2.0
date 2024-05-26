@@ -59,22 +59,27 @@ bool StringValidator::IsValidNumber(const std::string &str, size_t &pos) const {
 
 bool StringValidator::IsValidOperator(size_t i) const {
   if (i == 0 && stringEquation_[i] != '-') return false;
-  if (stringEquation_[i] == '-' && 
-      (i == 0 || IsOpeningBracket(stringEquation_[i - 1]) || IsOperator(stringEquation_[i - 1]))) {
+  if (stringEquation_[i] == '-' &&
+      (i == 0 || IsOpeningBracket(stringEquation_[i - 1]) ||
+       IsOperator(stringEquation_[i - 1]))) {
     return true;
   }
-  if (i > 0 && (IsOperator(stringEquation_[i - 1]) || IsOpeningBracket(stringEquation_[i - 1]) ||
-                (i < stringEquation_.length() - 1 && IsClosingBracket(stringEquation_[i + 1])))) {
+  if (i > 0 && (IsOperator(stringEquation_[i - 1]) ||
+                IsOpeningBracket(stringEquation_[i - 1]) ||
+                (i < stringEquation_.length() - 1 &&
+                 IsClosingBracket(stringEquation_[i + 1])))) {
     return false;
   }
   return true;
 }
 
 bool StringValidator::HandleOpenBracket(size_t i) const {
-  if (i > 0 && (std::isdigit(stringEquation_[i - 1]) || IsClosingBracket(stringEquation_[i - 1]))) {
+  if (i > 0 && (std::isdigit(stringEquation_[i - 1]) ||
+                IsClosingBracket(stringEquation_[i - 1]))) {
     return false;
   }
-  if (i + 1 < stringEquation_.length() && IsClosingBracket(stringEquation_[i + 1])) {
+  if (i + 1 < stringEquation_.length() &&
+      IsClosingBracket(stringEquation_[i + 1])) {
     return false;
   }
   open_bracket++;
@@ -82,7 +87,8 @@ bool StringValidator::HandleOpenBracket(size_t i) const {
 }
 
 bool StringValidator::HandleCloseBracket(size_t i) const {
-  if (i + 1 < stringEquation_.length() && std::isdigit(stringEquation_[i + 1])) {
+  if (i + 1 < stringEquation_.length() &&
+      std::isdigit(stringEquation_[i + 1])) {
     return false;
   }
   close_bracket++;
@@ -96,7 +102,8 @@ bool StringValidator::IsValidFunction(size_t &i) const {
   for (const std::string &func : functions) {
     if (stringEquation_.substr(i, func.length()) == func) {
       i += func.length() - 1;
-      return i + 1 < stringEquation_.length() && IsOpeningBracket(stringEquation_[i + 1]);
+      return i + 1 < stringEquation_.length() &&
+             IsOpeningBracket(stringEquation_[i + 1]);
     }
   }
   return false;
@@ -110,16 +117,10 @@ bool StringValidator::IsOperator(char c) const {
   return operators.find(c) != std::string::npos;
 }
 
-bool StringValidator::IsFunctionChar(char c) const {
-  return std::isalpha(c);
-}
+bool StringValidator::IsFunctionChar(char c) const { return std::isalpha(c); }
 
-bool StringValidator::IsOpeningBracket(char c) const {
-  return c == '(';
-}
+bool StringValidator::IsOpeningBracket(char c) const { return c == '('; }
 
-bool StringValidator::IsClosingBracket(char c) const {
-  return c == ')';
-}
+bool StringValidator::IsClosingBracket(char c) const { return c == ')'; }
 
 }  // namespace MyCalculator
