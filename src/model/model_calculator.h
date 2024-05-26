@@ -13,7 +13,8 @@ namespace MyCalculator {
 class ModelCalculator {
  public:
   ModelCalculator() : answer_(0) {}
-  ModelCalculator(const std::string &express) : answer_(evaluateExpression(express)) {}
+  ModelCalculator(const std::string &express)
+      : answer_(evaluateExpression(express)) {}
   double evaluateExpression(const std::string &expression);
   double unaryCalculate(char func, double operand);
   double binaryCalculate(char operation, double operand1, double operand2);
