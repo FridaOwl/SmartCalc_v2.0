@@ -12,12 +12,6 @@ class StringValidator {
  public:
   explicit StringValidator(const std::string &input) : stringEquation_(input) {}
 
-  /**
-   * @brief Checks if the string is valid.
-   *
-   * @return true if the string is valid.
-   * @return false if the string is invalid.
-   */
   bool IsValid() const;
 
  private:
@@ -26,13 +20,18 @@ class StringValidator {
       "cos", "sin", "tan", "acos", "asin", "atan", "sqrt", "ln", "log"};
   mutable int open_bracket = 0;
   mutable int close_bracket = 0;
+  std::string stringEquation_;
+
   bool IsValidNumber(const std::string &equation, size_t &index) const;
   bool IsValidOperator(size_t i) const;
   bool HandleOpenBracket(size_t i) const;
   bool HandleCloseBracket(size_t i) const;
   bool IsValidFunction(size_t &i) const;
-
-  std::string stringEquation_;
+  bool IsDigitOrDot(char c) const;
+  bool IsOperator(char c) const;
+  bool IsFunctionChar(char c) const;
+  bool IsOpeningBracket(char c) const;
+  bool IsClosingBracket(char c) const;
 };
 
 }  // namespace MyCalculator
