@@ -22,6 +22,11 @@ class Credit {
                        int type_payment, PaymentOutput &output);
 
  private:
+  void CalculateDifferentiated(double credit_sum, double credit_time,
+                               double percent, PaymentOutput &output);
+  void CalculateAnnuity(double credit_sum, double credit_time, double percent,
+                        PaymentOutput &output);
+  double CalculateMonthlyInterest(double credit_sum, double percent, int days);
 };
 
 }  // namespace MyCalculator

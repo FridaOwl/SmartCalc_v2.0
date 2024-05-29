@@ -2,39 +2,51 @@
 
 namespace MyCalculator {
 
-void MyCalculator::Credit::CalculateCredit(double credit_sum,
-                                           double credit_time, double percent,
-                                           int type_payment,
-                                           PaymentOutput &output) {
-  double sd = credit_sum / credit_time;
-  double sp = 1.0;
-  double start_credit_sum = credit_sum;
-
+void Credit::CalculateCredit(double credit_sum, double credit_time,
+                             double percent, int type_payment,
+                             PaymentOutput &output) {
+  percent /= 100.0;
   if (type_payment) {
-    double days[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    int i = 0;
-    percent = percent / 100.0;
-    output.total_payment = 0.0;
-    output.first_payment = sd + credit_sum * percent * days[0] / 365.0;
-    while (credit_sum > 0) {
-      sp = credit_sum * percent * days[i] / 365.0;
-      credit_sum = credit_sum - sd;
-      output.total_payment = output.total_payment + sd + sp;
-      if (i == 11) {
-        i = 0;
-      } else {
-        i++;
-      }
-    }
-    output.last_payment = sp + sd;
+    calculateDifferentiated(credit_sum, credit_time, percent, output);
   } else {
-    percent = percent / 1200;
-    output.last_payment = output.first_payment =
-        credit_sum * percent / (1 - std::pow((1 + percent), (0 - credit_time)));
-    output.total_payment = output.first_payment * credit_time;
+    calculateAnnuity(credit_sum, credit_time, percent, output);
+  }
+}
+
+void Credit::calculateDifferentiated(double credit_sum, double credit_time,
+                                     double percent, PaymentOutput &output) {
+  static const int days_in_month[] = {31, 28, 31, 30, 31, 30,
+                                      31, 31, 30, 31, 30, 31};
+  double monthly_payment = credit_sum / credit_time;
+  double current_sum = credit_sum;
+  int month = 0;
+
+  output.total_payment = 0.0;
+  output.first_payment =
+      monthly_payment + current_sum * percent * days_in_month[0] / 365.0;
+
+  while (current_sum > 0) {
+    double interest_payment =
+        current_sum * percent * days_in_month[month] / 365.0;
+    current_sum -= monthly_payment;
+    output.total_payment += monthly_payment + interest_payment;
+    month = (month + 1) % 12;
   }
 
-  output.overpayment = output.total_payment - start_credit_sum;
+  output.last_payment = monthly_payment + current_sum * percent *
+                                              days_in_month[(month - 1) % 12] /
+                                              365.0;
+  output.overpayment = output.total_payment - credit_sum;
+}
+
+void Credit::calculateAnnuity(double credit_sum, double credit_time,
+                              double percent, PaymentOutput &output) {
+  percent /= 12.0;
+  output.first_payment =
+      credit_sum * percent / (1 - std::pow(1 + percent, -credit_time));
+  output.total_payment = output.first_payment * credit_time;
+  output.last_payment = output.first_payment;
+  output.overpayment = output.total_payment - credit_sum;
 }
 
 }  // namespace MyCalculator
