@@ -1,74 +1,56 @@
-#include "model_deposit.h"
+#include "model_credit.h"
 
 namespace MyCalculator {
 
-void MyCalculator::Deposit::CalculateDeposit(
-    double summ, double n, double interest_rate, double tax_rate,
-    int periodicity_payments, int capitalization, int count_add, double add,
-    int count_sub, double sub, DepositOutput &output) {
-  int flag = 0;
-  double tax = tax_rate / 100;
-  output.accrued_interest = 0;
+void Credit::CalculateCredit(double credit_sum, double credit_time,
+                             double percent, int type_payment,
+                             PaymentOutput &output) {
+  percent /= 100.0;
+  output.total_payment = 0.0;
 
-  if (capitalization == 2) {
-    for (int i = 0; i < n && !flag; i++) {
-      if (count_add && count_sub)
-        summ = summ + add - sub;
-      else if (!count_add && count_sub)
-        summ = summ - sub;
-      else if (count_add && !count_sub)
-        summ = summ + add;
-
-      if (summ < 0) flag = 1;
-      double month_per = (summ * interest_rate / 36500) * 30;
-      output.accrued_interest += month_per;
-    }
-    output.result = summ + output.accrued_interest;
-    if (output.accrued_interest >= 75000)
-      output.tax_with = output.accrued_interest * tax;
-    else
-      output.tax_with = 0;
-  } else if (capitalization == 1 && periodicity_payments == 2) {
-    double month_per = 0;
-    for (int i = 0; i < n && !flag; i++) {
-      if (count_add && count_sub)
-        summ = summ + add - sub + month_per;
-      else if (!count_add && count_sub)
-        summ = summ - sub + month_per;
-      else if (count_add && !count_sub)
-        summ = summ + add + month_per;
-      else
-        summ = summ + month_per;
-
-      if (summ < 0) flag = 1;
-      month_per = (summ * interest_rate / 36500) * 30;
-      output.accrued_interest += month_per;
-    }
-    output.result = summ + month_per;
-    if (output.accrued_interest >= 75000)
-      output.tax_with = output.accrued_interest * tax;
-    else
-      output.tax_with = 0;
-  } else if (capitalization == 1 && periodicity_payments == 1) {
-    double month_per = 0;
-    for (int i = 0; i < n && !flag; i++) {
-      if (count_add && count_sub)
-        summ = summ + add - sub;
-      else if (!count_add && count_sub)
-        summ = summ - sub;
-      else if (count_add && !count_sub)
-        summ = summ + add;
-
-      if (summ < 0) flag = 1;
-      month_per = (summ * interest_rate / 36500) * 30;
-      output.accrued_interest += month_per;
-    }
-    output.result = summ + output.accrued_interest;
-    if (output.accrued_interest >= 75000)
-      output.tax_with = output.accrued_interest * tax;
-    else
-      output.tax_with = 0;
+  if (type_payment == 1) {
+    CalculateDifferentiated(credit_sum, credit_time, percent, output);
+  } else {
+    CalculateAnnuity(credit_sum, credit_time, percent, output);
   }
+
+  output.overpayment = output.total_payment - credit_sum;
+}
+
+void Credit::CalculateDifferentiated(double credit_sum, double credit_time,
+                                     double percent, PaymentOutput &output) {
+  const int days_in_year = 365;
+  const std::vector<int> days_in_month = {31, 28, 31, 30, 31, 30,
+                                          31, 31, 30, 31, 30, 31};
+  double monthly_payment = credit_sum / credit_time;
+  double current_sum = credit_sum;
+  double first_month_interest =
+      CalculateMonthlyInterest(credit_sum, percent, days_in_month[0]);
+  output.first_payment = monthly_payment + first_month_interest;
+
+  for (size_t i = 0; i < days_in_month.size(); ++i) {
+    if (current_sum <= 0) break;
+    double monthly_interest =
+        CalculateMonthlyInterest(current_sum, percent, days_in_month[i]);
+    current_sum -= monthly_payment;
+    output.total_payment += monthly_payment + monthly_interest;
+    if (i == days_in_month.size() - 1) {
+      output.last_payment = monthly_payment + monthly_interest;
+    }
+  }
+}
+
+void Credit::CalculateAnnuity(double credit_sum, double credit_time,
+                              double percent, PaymentOutput &output) {
+  percent /= 12;
+  double annuity_factor = percent / (1 - std::pow(1 + percent, -credit_time));
+  output.first_payment = output.last_payment = credit_sum * annuity_factor;
+  output.total_payment = output.first_payment * credit_time;
+}
+
+double Credit::CalculateMonthlyInterest(double credit_sum, double percent,
+                                        int days) {
+  return credit_sum * percent * days / 365;
 }
 
 }  // namespace MyCalculator
