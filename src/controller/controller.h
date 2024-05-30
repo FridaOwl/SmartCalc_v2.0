@@ -1,14 +1,16 @@
 #ifndef CONTROLLER_H_
 #define CONTROLLER_H_
 
-#include "../model/model_calculator.h"
-#include "../model/model_credit.h"
-#include "../model/model_deposit.h"
+#include "model_calculator.h"
+#include "model_credit.h"
+#include "model_deposit.h"
 
 namespace MyCalculator {
+
 class CalcController {
  public:
   CalcController() = default;
+
   double CalculateExpression(const std::string &expression);
   void CalculateCredit(double credit_sum, double credit_time, double percent,
                        int type_payment, Credit::PaymentOutput &output);
@@ -23,6 +25,7 @@ class CalcController {
   Credit credit_;
   Deposit deposit_;
 };
+
 }  // namespace MyCalculator
 
 #endif  // CONTROLLER_H_
