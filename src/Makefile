@@ -8,7 +8,7 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
   	OPEN_CMD = xdg-open
 	LEAKS_CMD = valgrind --tool=memcheck --leak-check=yes
-	PATH_APP = SmartCalc_v2.0/SmartCalc_v2
+	PATH_APP = MyCalculator/MyCalc
 	ADD_LIB = -lgtest -lpthread -lm
 	GCOV_FLAGS = 
 endif
@@ -16,7 +16,7 @@ endif
 ifeq ($(UNAME_S),Darwin)
 	OPEN_CMD = open -a "Google Chrome"
 	LEAKS_CMD = leaks -atExit --
-	PATH_APP = SmartCalc_v2.0/SmartCalc_v2.app/Contents/MacOS/SmartCalc_v2
+	PATH_APP = MyCalculator/MyCalc.app/Contents/MacOS/MyCalc
 	ADD_LIB = -lgtest -lm
 	GCOV_FLAGS = --ignore-errors mismatch
 endif
@@ -24,22 +24,22 @@ endif
 all: install
 
 install:
-	@rm -rf SmartCalc_v2.0
-	@mkdir SmartCalc_v2.0
-	@cd SmartCalc_v2.0/ && qmake ../view/SmartCalc_v2.0.pro && make -j6 && make clean && rm -rf Makefile .qmake.stash
+	@rm -rf MyCalculator
+	@mkdir MyCalculator
+	@cd MyCalculator/ && qmake ../view/MyCalculator.pro && make -j6 && make clean && rm -rf Makefile .qmake.stash
 
 uninstall:
-	@rm -rf SmartCalc_v2.0
+	@rm -rf MyCalculator
 
 start:
-	@cd SmartCalc_v2.0/ ./SmartCalc_v2
+	@cd MyCalculator/ ./MyCalc
 
 dist: install
 	@rm -rf dist
 	@mkdir dist
 	@cp -R $(PATH_APP) model view controller tests Makefile dvi.md dist
-	@cd dist && tar cvzf SmartCalc_v2.0.tgz * && rm -rf controller model tests view SmartCalc_v2 Makefile dvi.md
-	@rm -rf SmartCalc_v2.0
+	@cd dist && tar cvzf MyCalculator.tgz * && rm -rf controller model tests view MyCalc Makefile dvi.md
+	@rm -rf MyCalculator
 
 dvi:
 	@$(OPEN_CMD) dvi.md
